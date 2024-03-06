@@ -30,7 +30,7 @@ class NonEmptyTree : public ::testing::Test
         BinaryTree tree;
         virtual void SetUp(){
             int values[] = {1,2,3,4,5};
-            for (size_t i = 0; i < 6; i++){
+            for (unsigned i = 0; i < 6; i++){
                 tree.InsertNode(values[i]);
             }
         }
@@ -52,7 +52,7 @@ class TreeAxioms : public ::testing::Test
 TEST_F(NonEmptyTree, InsertNode)
 {
     
-    tree.DeleteNode(0);
+    EXPECT_FALSE(tree.DeleteNode(0));
     EXPECT_TRUE(tree.InsertNode(0).first);
     EXPECT_FALSE(tree.InsertNode(tree.GetRoot()->key).first);
 
@@ -68,19 +68,28 @@ TEST_F(NonEmptyTree, InsertNode)
     }
 }
 
+TEST_F(NonEmptyTree, InsertNode_Negative)
+{
+    EXPECT_TRUE(tree.InsertNode(-1).first);
+    EXPECT_NE(tree.InsertNode(-1).second, nullptr);
+}
+
+TEST_F(NonEmptyTree, InsertNode_More)
+{
+    for (size_t i = 1; i < 6; i++)
+    {
+        EXPECT_TRUE(tree.DeleteNode(i));
+    }
+    for (size_t i = 1; i < 20; i++)
+    {
+        EXPECT_TRUE(tree.InsertNode(i).first);
+    }
+}
+
 TEST_F(NonEmptyTree, FindNode)
 {
-    std::vector<Node_t*> nodeVector;
-    tree.GetLeafNodes(nodeVector);
-    for (auto element : nodeVector)
-    {
-        int color;
-        color = element->color;
-        std::cout << color;
-    }
-
-    int rootkey = tree.GetRoot()->key; //finds and saves id of root
-    EXPECT_TRUE(tree.FindNode(rootkey)); //attempts to find root, expecting true when nonemptytree
+    int rootkey = tree.GetRoot()->key; 
+    EXPECT_TRUE(tree.FindNode(rootkey)); 
 
     tree.InsertNode(6);
     EXPECT_TRUE(tree.FindNode(6));
@@ -88,6 +97,29 @@ TEST_F(NonEmptyTree, FindNode)
     EXPECT_FALSE(tree.FindNode(6));
     
     EXPECT_TRUE(tree.FindNode(rand()%5));
+}
+
+TEST_F(NonEmptyTree, FindNode_Colors)
+{
+    std::vector<Node_t*> nodeVector;
+    tree.GetLeafNodes(nodeVector);
+    for (auto element : nodeVector)
+    {
+        int color;
+        color = element->color;
+        EXPECT_EQ(color, 1);
+    }
+}
+
+TEST_F(NonEmptyTree, FindNode_Random)
+{
+    EXPECT_TRUE(tree.FindNode(rand()%5));
+    EXPECT_TRUE(tree.FindNode(rand()%5));
+    int value = rand()%100;
+    if (value > 6)
+        EXPECT_FALSE(tree.FindNode(value));
+    else
+        EXPECT_TRUE(tree.FindNode(value));
 }
 
 TEST_F(NonEmptyTree, DeleteNode)
@@ -107,6 +139,17 @@ TEST_F(NonEmptyTree, DeleteNode)
         EXPECT_TRUE(tree.DeleteNode(tree.GetRoot()->pRight->key));
 }
 
+TEST_F(NonEmptyTree, DeleteNode_Existing)
+{
+    EXPECT_TRUE(tree.DeleteNode(1));
+    EXPECT_FALSE(tree.DeleteNode(1));
+}
+
+TEST_F(NonEmptyTree, DeleteNode_NoNExisting)
+{
+    EXPECT_FALSE(tree.DeleteNode(7));
+}
+
 TEST_F(EmptyTree, InsertNode)
 {
     EXPECT_TRUE(tree.InsertNode(0).first);
@@ -119,6 +162,11 @@ TEST_F(EmptyTree, InsertNode)
     EXPECT_EQ(tree.FindNode(random)->pParent, nullptr);
     tree.DeleteNode(random);
     EXPECT_NO_FATAL_FAILURE(tree.FindNode(random));
+}
+
+TEST_F(EmptyTree, InsertNode_Negative)
+{
+    EXPECT_TRUE(tree.InsertNode(-1).first);
 }
 
 TEST_F(EmptyTree, DeleteNode)

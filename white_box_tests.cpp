@@ -67,9 +67,17 @@ TEST_F(HTableTest, reserveTEST){
     hash_map_remove(map, "key2");
 }
 
+TEST_F(HTableTest, reserveTOOMUCHTEST){
+    EXPECT_EQ(hash_map_reserve(map, 5), OK);
+    EXPECT_EQ(hash_map_put(map, "key1", 1), OK);
+    EXPECT_EQ(hash_map_put(map, "key2", 2), OK);
+    EXPECT_EQ(hash_map_put(map, "key3", 3), OK);
+    EXPECT_EQ(hash_map_put(map, "key4", 4), OK);
+    EXPECT_EQ(hash_map_put(map, "key5", 5), OK);
+    EXPECT_EQ(hash_map_put(map, "key6", 6), OK);
+}
+
 TEST_F(HTableTest, reserveMORETEST){
-    //fixit
-    
     int alloc;
     EXPECT_EQ(hash_map_put(map, "key1", 1), OK);
 	EXPECT_EQ(hash_map_put(map, "key2", 2), OK);
